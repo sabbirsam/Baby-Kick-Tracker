@@ -3,7 +3,7 @@
  * Plugin Name: Baby Kick Tracker
  * Plugin URI: sabbirsam/baby-kick-tracker
  * Description: A WordPress plugin to track baby kicks during pregnancy, send alerts, and display statistics.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: sabbirsam
  * Author URI: https://sabbirsam.com
  * Text Domain: baby-kick-tracker
@@ -733,20 +733,19 @@ class Baby_Kick_Tracker {
     }
     
     // Enqueue frontend scripts and styles
-    // Enqueue frontend scripts and styles
     public function enqueue_frontend_scripts() {
         wp_enqueue_style(
             'baby-kick-tracker-style',
             plugin_dir_url(__FILE__) . 'assets/css/baby-kick-tracker.css',
             array(),
-            '1.0.0'
+            '2.0.0'
         );
         
         wp_enqueue_script(
             'baby-kick-tracker-script',
             plugin_dir_url(__FILE__) . 'assets/js/baby-kick-tracker.js',
             array('jquery'),
-            '1.0.0',
+            '2.0.0',
             true
         );
         
