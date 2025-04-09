@@ -1,0 +1,94 @@
+/* Baby Kick Tracker Admin Styles */
+.baby-kick-admin-container {
+    max-width: 1200px;
+    margin: 20px 0;
+}
+
+.baby-kick-admin-card {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.baby-kick-admin-card-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.baby-kick-admin-card-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #23282d;
+}
+
+.baby-kick-admin-stats {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+}
+
+.baby-kick-admin-stat-card {
+    flex: 1 1 200px;
+    margin: 0 10px 20px;
+    padding: 15px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.baby-kick-admin-stat-title {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.baby-kick-admin-stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #343a40;
+}
+
+.baby-kick-admin-chart-container {
+    height: 300px;
+    margin-top: 20px;
+}
+
+.baby-kick-admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.baby-kick-admin-table th,
+.baby-kick-admin-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.baby-kick-admin-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.baby-kick-admin-pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.baby-kick-admin-pagination .page-numbers {
+    padding: 5px 10px;
+    margin: 0 2px;
+    border-radius: 3px;
+    background-color: #f8f9fa;
+    color: #23282d;
+    text-decoration: none;
+}
+
+.baby-kick-admin-pagination .page-numbers.current {
+    background-color: #0073aa;
+    color: #fff;
+}
