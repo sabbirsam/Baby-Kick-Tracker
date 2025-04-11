@@ -79,6 +79,45 @@
                 <p>No sessions recorded yet.</p>
             <?php endif; ?>
         </div>
+
+        <!-- Pregnancy Status -->
+        <?php if ($pregnancy_details['due_date']): ?>
+        <div class="baby-kick-admin-card">
+            <div class="baby-kick-admin-card-header">
+                <h2>Pregnancy Status</h2>
+            </div>
+            
+            <table class="widefat">
+                <tr>
+                    <th>Current Stage</th>
+                    <td><?php echo $pregnancy_details['weeks']; ?> weeks and <?php echo $pregnancy_details['days']; ?> days (<?php echo $pregnancy_details['trimester']; ?> Trimester)</td>
+                </tr>
+                <tr>
+                    <th>Due Date</th>
+                    <td><?php echo $pregnancy_details['due_date']; ?></td>
+                </tr>
+                <tr>
+                    <th>Remaining Time</th>
+                    <td><?php echo $pregnancy_details['remaining_weeks']; ?> weeks and <?php echo $pregnancy_details['remaining_days'] % 7; ?> days</td>
+                </tr>
+                <?php if (isset($options['mother_weight']) && isset($options['pre_pregnancy_weight'])): ?>
+                <tr>
+                    <th>Weight Gain</th>
+                    <td><?php echo number_format($options['mother_weight'] - $options['pre_pregnancy_weight'], 1); ?> kg</td>
+                </tr>
+                <?php endif; ?>
+            </table>
+            
+            <div class="baby-kick-admin-card-subheader">
+                <h3>Week <?php echo $pregnancy_details['weeks']; ?> Development</h3>
+            </div>
+            <p><strong>Baby:</strong> <?php echo $weekly_info['baby']; ?></p>
+            <p><strong>Mother:</strong> <?php echo $weekly_info['mother']; ?></p>
+            <p><strong>Tip:</strong> <?php echo $weekly_info['tip']; ?></p>
+        </div>
+        <?php endif; ?>
+
+
         
         <!-- Weekly Chart -->
         <div class="baby-kick-admin-card">

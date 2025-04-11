@@ -3,7 +3,7 @@
  * Plugin Name: Baby Kick Tracker
  * Plugin URI: sabbirsam/baby-kick-tracker
  * Description: A WordPress plugin to track baby kicks during pregnancy, send alerts, and display statistics.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: sabbirsam
  * Author URI: https://sabbirsam.com
  * Text Domain: baby-kick-tracker
@@ -189,6 +189,45 @@ class Baby_Kick_Tracker {
             array($this, 'settings_section_callback'),
             'baby_kick_tracker_settings'
         );
+
+        add_settings_section(
+            'baby_kick_tracker_pregnancy_settings',
+            'Pregnancy Details',
+            array($this, 'pregnancy_settings_section_callback'),
+            'baby_kick_tracker_settings'
+        );
+
+        add_settings_field(
+            'assessment_period_hours',
+            'Assessment Period (hours)',
+            array($this, 'assessment_period_hours_callback'),
+            'baby_kick_tracker_settings',
+            'baby_kick_tracker_main_settings'
+        );
+
+        add_settings_field(
+            'mother_weight',
+            'Mother\'s Current Weight (kg)',
+            array($this, 'mother_weight_callback'),
+            'baby_kick_tracker_settings',
+            'baby_kick_tracker_pregnancy_settings'
+        );
+        
+        add_settings_field(
+            'pre_pregnancy_weight',
+            'Pre-Pregnancy Weight (kg)',
+            array($this, 'pre_pregnancy_weight_callback'),
+            'baby_kick_tracker_settings',
+            'baby_kick_tracker_pregnancy_settings'
+        );
+
+        add_settings_field(
+            'period_miss_date',
+            'Last Period Date',
+            array($this, 'period_miss_date_callback'),
+            'baby_kick_tracker_settings',
+            'baby_kick_tracker_pregnancy_settings'
+        );
         
         add_settings_field(
             'mother_email',
@@ -219,6 +258,88 @@ class Baby_Kick_Tracker {
     public function settings_section_callback() {
         echo '<p>Configure the Baby Kick Tracker settings below:</p>';
     }
+
+    public function assessment_period_hours_callback() {
+        $options = get_option('baby_kick_tracker_options');
+        $period = isset($options['assessment_period_hours']) ? intval($options['assessment_period_hours']) : 2;
+        echo '<input type="number" id="assessment_period_hours" name="baby_kick_tracker_options[assessment_period_hours]" value="' . esc_attr($period) . '" class="small-text" min="1" max="24" />';
+        echo '<p class="description">Time period for counting kicks (1-24 hours).</p>';
+    }
+
+    public function pregnancy_settings_section_callback() {
+        echo '<p>Enter pregnancy details to track progress and calculate the estimated delivery date:</p>';
+    }
+    
+    public function period_miss_date_callback() {
+        $options = get_option('baby_kick_tracker_options');
+        echo '<input type="date" id="period_miss_date" name="baby_kick_tracker_options[period_miss_date]" value="' . esc_attr($options['period_miss_date'] ?? '') . '" />';
+        echo '<p class="description">First day of last menstrual period.</p>';
+    }
+    
+    public function mother_weight_callback() {
+        $options = get_option('baby_kick_tracker_options');
+        echo '<input type="number" step="0.1" id="mother_weight" name="baby_kick_tracker_options[mother_weight]" value="' . esc_attr($options['mother_weight'] ?? '') . '" class="regular-text" />';
+        echo '<p class="description">Current weight in kilograms.</p>';
+    }
+    
+    public function pre_pregnancy_weight_callback() {
+        $options = get_option('baby_kick_tracker_options');
+        echo '<input type="number" step="0.1" id="pre_pregnancy_weight" name="baby_kick_tracker_options[pre_pregnancy_weight]" value="' . esc_attr($options['pre_pregnancy_weight'] ?? '') . '" class="regular-text" />';
+        echo '<p class="description">Weight before pregnancy in kilograms.</p>';
+    }
+    
+    // Add this function to calculate and display pregnancy details:
+    public function get_pregnancy_details() {
+        $options = get_option('baby_kick_tracker_options');
+        $period_miss_date = isset($options['period_miss_date']) && !empty($options['period_miss_date']) ? 
+                           $options['period_miss_date'] : null;
+        
+        if (!$period_miss_date) {
+            return array(
+                'weeks' => 0,
+                'days' => 0,
+                'due_date' => null,
+                'remaining_days' => 0,
+                'remaining_weeks' => 0,
+                'trimester' => ''
+            );
+        }
+        
+        // Calculate pregnancy duration
+        $period_date = new DateTime($period_miss_date);
+        $current_date = new DateTime(current_time('Y-m-d'));
+        $interval = $period_date->diff($current_date);
+        
+        // Calculate due date (280 days from LMP)
+        $due_date = clone $period_date;
+        $due_date->add(new DateInterval('P280D'));
+        
+        // Calculate remaining time
+        $remaining_interval = $current_date->diff($due_date);
+        
+        // Calculate weeks and days
+        $total_days = $interval->days;
+        $weeks = floor($total_days / 7);
+        $days = $total_days % 7;
+        
+        // Determine trimester
+        $trimester = 'First';
+        if ($weeks >= 13 && $weeks < 27) {
+            $trimester = 'Second';
+        } elseif ($weeks >= 27) {
+            $trimester = 'Third';
+        }
+        
+        return array(
+            'weeks' => $weeks,
+            'days' => $days,
+            'due_date' => $due_date->format('F j, Y'),
+            'remaining_days' => $remaining_interval->days,
+            'remaining_weeks' => floor($remaining_interval->days / 7),
+            'trimester' => $trimester
+        );
+    }
+
     
     // Mother email field callback
     public function mother_email_callback() {
@@ -240,6 +361,92 @@ class Baby_Kick_Tracker {
         echo '<input type="number" id="kicks_threshold" name="baby_kick_tracker_options[kicks_threshold]" value="' . esc_attr($options['kicks_threshold']) . '" class="small-text" min="1" />';
         echo '<p class="description">Minimum number of kicks expected in a 2-hour period (default: 10).</p>';
     }
+
+    // Add this function to the class:
+    public function get_weekly_pregnancy_info($week) {
+        $info = array(
+            // First trimester
+            1 => array(
+                'baby' => 'Your baby is a tiny cluster of cells called a blastocyst.',
+                'mother' => 'You may not feel pregnant yet, but hormonal changes have begun.',
+                'tip' => 'Start taking prenatal vitamins with folic acid.',
+                'quote' => 'Every journey begins with a single step.'
+            ),
+            4 => array(
+                'baby' => 'Your baby\'s heart begins to form and beat.',
+                'mother' => 'You might experience morning sickness and fatigue.',
+                'tip' => 'Get plenty of rest and stay hydrated.',
+                'quote' => 'The most precious jewels you\'ll ever have around your neck are the arms of your child.'
+            ),
+            8 => array(
+                'baby' => 'All essential organs have begun to form. Tiny fingers and toes are developing.',
+                'mother' => 'Your uterus has doubled in size. You may feel bloated and emotional.',
+                'tip' => 'Eat small, frequent meals to help with nausea.',
+                'quote' => 'A baby fills a place in your heart that you never knew was empty.'
+            ),
+            12 => array(
+                'baby' => 'Your baby is about the size of a lime and can make facial expressions.',
+                'mother' => 'First trimester symptoms may ease. You might have a visible bump.',
+                'tip' => 'Start doing Kegel exercises to strengthen pelvic floor muscles.',
+                'quote' => 'Pregnancy is the only time when you can carry your heart outside your body.'
+            ),
+            // Second trimester
+            16 => array(
+                'baby' => 'Your baby can make sucking motions and may respond to loud sounds.',
+                'mother' => 'You may feel more energetic and experience the "pregnancy glow".',
+                'tip' => 'Start sleeping on your side to improve circulation.',
+                'quote' => 'Being pregnant is like having your very own science lab—in your belly!'
+            ),
+            20 => array(
+                'baby' => 'Your baby is about the size of a banana. You might feel movement.',
+                'mother' => 'Your belly is growing noticeably. You may have more energy.',
+                'tip' => 'Consider signing up for prenatal classes.',
+                'quote' => 'A baby is something you carry for nine months, in your arms for three years, and in your heart forever.'
+            ),
+            24 => array(
+                'baby' => 'Your baby\'s face is fully formed and they have a regular schedule of sleeping and waking.',
+                'mother' => 'You may experience backaches and leg cramps.',
+                'tip' => 'Stay active with gentle exercise like swimming or yoga.',
+                'quote' => 'Every kick reminds me that I am never alone.'
+            ),
+            // Third trimester
+            28 => array(
+                'baby' => 'Your baby can open their eyes and has a regular sleep-wake cycle.',
+                'mother' => 'You may experience shortness of breath and Braxton Hicks contractions.',
+                'tip' => 'Practice different labor positions and breathing techniques.',
+                'quote' => 'The moment a child is born, the mother is also born.'
+            ),
+            32 => array(
+                'baby' => 'Your baby is practicing breathing motions and gaining weight rapidly.',
+                'mother' => 'You may feel uncomfortable and have trouble sleeping.',
+                'tip' => 'Use pillows to support your growing belly while sleeping.',
+                'quote' => 'Your body knows what to do. Trust the process.'
+            ),
+            36 => array(
+                'baby' => 'Your baby is nearly ready for birth. Their lungs are maturing.',
+                'mother' => 'You may feel very tired and have practice contractions.',
+                'tip' => 'Make sure your hospital bag is packed.',
+                'quote' => 'A mother\'s joy begins when new life is stirring inside her.'
+            ),
+            40 => array(
+                'baby' => 'Your baby is fully developed and ready to meet you!',
+                'mother' => 'You may feel ready for delivery. Any day now!',
+                'tip' => 'Rest and relax as much as possible.',
+                'quote' => 'You are stronger than you know, more capable than you ever dreamed.'
+            )
+        );
+        
+        // Find the closest week info available
+        $closest_week = 1;
+        foreach (array_keys($info) as $key_week) {
+            if ($week >= $key_week && $key_week > $closest_week) {
+                $closest_week = $key_week;
+            }
+        }
+        
+        return $info[$closest_week] ?? $info[1];
+    }
+
     
     // Render admin dashboard page
     public function render_admin_page() {
@@ -279,6 +486,13 @@ class Baby_Kick_Tracker {
         foreach ($last_week_data as $day_data) {
             $chart_labels[] = date('M d', strtotime($day_data->date));
             $chart_data[] = (int) $day_data->total_kicks;
+        }
+
+        // Get pregnancy details
+        $pregnancy_details = $this->get_pregnancy_details();
+        $weekly_info = array();
+        if (isset($pregnancy_details['weeks'])) {
+            $weekly_info = $this->get_weekly_pregnancy_info($pregnancy_details['weeks']);
         }
         
         // Include the dashboard template
@@ -343,6 +557,9 @@ class Baby_Kick_Tracker {
         // Get the plugin options
         $options = get_option('baby_kick_tracker_options');
         $kicks_threshold = isset($options['kicks_threshold']) ? (int) $options['kicks_threshold'] : 10;
+
+        $pregnancy_details = $this->get_pregnancy_details();
+        $weekly_info = $this->get_weekly_pregnancy_info($pregnancy_details['weeks']);
         
         // Start output buffering
         ob_start();
@@ -755,7 +972,8 @@ class Baby_Kick_Tracker {
             array(
                 'ajaxurl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('baby_kick_tracker_nonce'),
-                'kicks_threshold' => get_option('baby_kick_tracker_options')['kicks_threshold'] ?? 10
+                'kicks_threshold' => get_option('baby_kick_tracker_options')['kicks_threshold'] ?? 10,
+                'assessment_period_hours' => get_option('baby_kick_tracker_options')['assessment_period_hours'] ?? 2
             )
         );
     }

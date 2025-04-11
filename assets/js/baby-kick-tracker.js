@@ -185,14 +185,20 @@
             timerDiv.text(timerText);
             
             // If session reaches 2 hours (7200 seconds), show completion message
-            if (diff >= 7200 && timer) {
+            /* if (diff >= 7200 && timer) {
                 clearInterval(timer);
                 timerDiv.text('Session completed (2 hours)');
+            } */
+
+            const assessmentPeriodSeconds = babyKickTracker.assessment_period_hours * 3600;
+            if (diff >= assessmentPeriodSeconds && timer) {
+                clearInterval(timer);
+                timerDiv.text('Session completed (' + babyKickTracker.assessment_period_hours + ' hours)');
             }
         }
         
         // Update the status display based on kick count
-        function updateStatus(totalKicks) {
+        /* function updateStatus(totalKicks) {
             statusDiv.removeClass('good warning');
             
             if (totalKicks >= kicksThreshold) {
@@ -203,7 +209,21 @@
                 statusDiv.html('<strong>In Progress:</strong> ' + totalKicks + ' kicks recorded. ' + 
                                'Goal is ' + kicksThreshold + ' kicks within 2 hours.');
             }
+        } */
+        function updateStatus(totalKicks) {
+            statusDiv.removeClass('good warning');
+            
+            if (totalKicks >= kicksThreshold) {
+                statusDiv.addClass('good');
+                statusDiv.html('<strong>Good!</strong> You\'ve reached the recommended number of kicks.');
+            } else {
+                statusDiv.addClass('warning');
+                statusDiv.html('<strong>In Progress:</strong> ' + totalKicks + ' kicks recorded. ' + 
+                                'Goal is ' + kicksThreshold + ' kicks within ' + 
+                                babyKickTracker.assessment_period_hours + ' hours.');
+            }
         }
+        
         
         // Format time from date object
         function formatTime(date) {

@@ -81,5 +81,56 @@
             <p>Kick counting is a way to monitor your baby's health during pregnancy. A healthy baby should have at least 10 movements in a 2-hour period.</p>
             <p>If you notice a significant decrease in your baby's movements, contact your healthcare provider right away.</p>
         </div>
+
+        <!-- Add this after the existing baby-kick-tracker-summary div -->
+        <?php if ($pregnancy_details['due_date']): ?>
+        <div class="baby-kick-tracker-pregnancy-info">
+            <h3>Your Pregnancy Journey</h3>
+            
+            <div class="baby-kick-tracker-pregnancy-stats">
+                <div class="baby-kick-tracker-stat">
+                    <span class="baby-kick-tracker-stat-value"><?php echo $pregnancy_details['weeks']; ?></span>
+                    <span class="baby-kick-tracker-stat-label">Weeks</span>
+                </div>
+                <div class="baby-kick-tracker-stat">
+                    <span class="baby-kick-tracker-stat-value"><?php echo $pregnancy_details['days']; ?></span>
+                    <span class="baby-kick-tracker-stat-label">Days</span>
+                </div>
+                <div class="baby-kick-tracker-stat">
+                    <span class="baby-kick-tracker-stat-value"><?php echo $pregnancy_details['trimester']; ?></span>
+                    <span class="baby-kick-tracker-stat-label">Trimester</span>
+                </div>
+            </div>
+            
+            <div class="baby-kick-tracker-due-date">
+                <strong>Estimated Due Date:</strong> <?php echo $pregnancy_details['due_date']; ?>
+                <p><em><?php echo $pregnancy_details['remaining_weeks']; ?> weeks and <?php echo $pregnancy_details['remaining_days'] % 7; ?> days remaining</em></p>
+            </div>
+            
+            <div class="baby-kick-tracker-weekly-info">
+                <h4>Week <?php echo $pregnancy_details['weeks']; ?> Highlights</h4>
+                
+                <div class="baby-kick-tracker-info-card">
+                    <h5>Your Baby</h5>
+                    <p><?php echo $weekly_info['baby']; ?></p>
+                </div>
+                
+                <div class="baby-kick-tracker-info-card">
+                    <h5>Your Body</h5>
+                    <p><?php echo $weekly_info['mother']; ?></p>
+                </div>
+                
+                <div class="baby-kick-tracker-info-card">
+                    <h5>Tip of the Week</h5>
+                    <p><?php echo $weekly_info['tip']; ?></p>
+                </div>
+                
+                <div class="baby-kick-tracker-quote">
+                    <blockquote>"<?php echo $weekly_info['quote']; ?>"</blockquote>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
     </div>
 </div>

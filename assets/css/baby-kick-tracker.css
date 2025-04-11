@@ -1,81 +1,96 @@
-/* Baby Kick Tracker Responsive Styles */
+/* Baby Kick Tracker Responsive Styles - Enhanced for all screen sizes */
 .baby-kick-tracker-container {
     max-width: 100%;
     margin: 0 auto;
-    padding: 15px;
+    padding: 10px;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
 .baby-kick-tracker-header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .baby-kick-tracker-header h2 {
     color: #333;
-    font-size: 1.5rem;
-    margin-bottom: 8px;
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+    word-wrap: break-word;
 }
 
 .baby-kick-tracker-header p {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #666;
+    margin: 0;
 }
 
 .baby-kick-tracker-form {
-    padding: 15px;
+    padding: 10px;
     background-color: #fff;
     border-radius: 5px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .baby-kick-tracker-field {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .baby-kick-tracker-field label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     font-weight: bold;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    word-wrap: break-word;
+}
+
+.baby-kick-tracker-field p {
+    margin: 5px 0;
+    font-size: 0.85rem;
 }
 
 .baby-kick-tracker-field input[type="text"],
 .baby-kick-tracker-field input[type="number"] {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    box-sizing: border-box;
 }
 
-/* Increase touch target size for mobile */
+/* Ensure input fields are properly sized for tiny screens */
 .baby-kick-tracker-field input[type="number"] {
-    height: 44px;
+    height: 40px;
+    min-width: 0;
 }
 
 .baby-kick-tracker-buttons {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-top: 20px;
+    gap: 10px;
+    margin-top: 15px;
 }
 
 .baby-kick-tracker-button {
     width: 100%;
-    padding: 12px 15px;
+    padding: 10px;
     background-color: #0073aa;
     color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.9rem;
     transition: background-color 0.3s;
     text-align: center;
     touch-action: manipulation;
-    /* Improves touch behavior */
+    white-space: normal;
+    /* Allow text to wrap on buttons */
+    word-wrap: break-word;
+    min-height: 44px;
+    /* Ensure minimum height for touch targets */
 }
 
 .baby-kick-tracker-button:hover {
@@ -110,12 +125,13 @@
 }
 
 .baby-kick-tracker-status {
-    margin-top: 20px;
-    padding: 15px;
+    margin-top: 15px;
+    padding: 10px;
     border-radius: 4px;
     background-color: #f1f1f1;
     text-align: center;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
+    word-wrap: break-word;
 }
 
 .baby-kick-tracker-status.good {
@@ -131,34 +147,120 @@
 }
 
 .baby-kick-tracker-timer {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: bold;
-    margin: 15px 0;
+    margin: 12px 0;
     text-align: center;
     padding: 8px;
     background-color: #f5f5f5;
     border-radius: 4px;
+    word-wrap: break-word;
 }
 
 .baby-kick-tracker-summary {
-    margin-top: 25px;
-    padding-top: 15px;
+    margin-top: 20px;
+    padding-top: 12px;
     border-top: 1px solid #eee;
 }
 
 .baby-kick-tracker-summary h3 {
-    margin-bottom: 10px;
-    font-size: 1.1rem;
+    margin-bottom: 8px;
+    font-size: 1rem;
     color: #333;
 }
 
 .baby-kick-tracker-summary p {
-    font-size: 0.95rem;
-    line-height: 1.5;
-    margin-bottom: 10px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-bottom: 8px;
 }
 
-/* Media queries for responsive design */
+/* Ultra-small screens (under 300px) */
+@media screen and (max-width: 299px) {
+    .baby-kick-tracker-container {
+        padding: 8px;
+        border-radius: 4px;
+    }
+
+    .baby-kick-tracker-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .baby-kick-tracker-header p {
+        font-size: 0.8rem;
+    }
+
+    .baby-kick-tracker-form {
+        padding: 8px;
+    }
+
+    .baby-kick-tracker-field label {
+        font-size: 0.85rem;
+    }
+
+    .baby-kick-tracker-field p {
+        font-size: 0.8rem;
+    }
+
+    .baby-kick-tracker-field input[type="text"],
+    .baby-kick-tracker-field input[type="number"] {
+        padding: 6px;
+        font-size: 0.85rem;
+        height: 36px;
+    }
+
+    .baby-kick-tracker-button {
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+
+    .baby-kick-tracker-timer {
+        font-size: 0.9rem;
+        padding: 6px;
+    }
+
+    .baby-kick-tracker-status {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+
+    .baby-kick-tracker-summary h3 {
+        font-size: 0.9rem;
+    }
+
+    .baby-kick-tracker-summary p {
+        font-size: 0.8rem;
+    }
+}
+
+/* Small screens (300px to 479px) */
+@media screen and (min-width: 300px) and (max-width: 479px) {
+    .baby-kick-tracker-container {
+        padding: 12px;
+    }
+
+    .baby-kick-tracker-header h2 {
+        font-size: 1.2rem;
+    }
+}
+
+/* Medium screens (480px to 767px) */
+@media screen and (min-width: 480px) and (max-width: 767px) {
+    .baby-kick-tracker-container {
+        max-width: 450px;
+        padding: 15px;
+    }
+
+    .baby-kick-tracker-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .baby-kick-tracker-form {
+        padding: 15px;
+    }
+}
+
+/* Larger screens (768px and above) */
 @media screen and (min-width: 768px) {
     .baby-kick-tracker-container {
         max-width: 700px;
@@ -180,10 +282,32 @@
 
     .baby-kick-tracker-button {
         width: 48%;
+        font-size: 1rem;
+    }
+
+    .baby-kick-tracker-field label {
+        font-size: 0.95rem;
+    }
+
+    .baby-kick-tracker-field p {
+        font-size: 0.9rem;
     }
 
     .baby-kick-tracker-timer {
         font-size: 1.2rem;
+    }
+
+    .baby-kick-tracker-status {
+        font-size: 0.95rem;
+    }
+
+    .baby-kick-tracker-summary h3 {
+        font-size: 1.1rem;
+    }
+
+    .baby-kick-tracker-summary p {
+        font-size: 0.95rem;
+        line-height: 1.5;
     }
 }
 
@@ -216,6 +340,10 @@
 
     .baby-kick-tracker-field label {
         color: #f0f0f0;
+    }
+
+    .baby-kick-tracker-field p {
+        color: #ddd;
     }
 
     .baby-kick-tracker-field input[type="text"],
