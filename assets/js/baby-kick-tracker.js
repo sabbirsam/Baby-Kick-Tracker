@@ -198,18 +198,6 @@
         }
         
         // Update the status display based on kick count
-        /* function updateStatus(totalKicks) {
-            statusDiv.removeClass('good warning');
-            
-            if (totalKicks >= kicksThreshold) {
-                statusDiv.addClass('good');
-                statusDiv.html('<strong>Good!</strong> You\'ve reached the recommended number of kicks.');
-            } else {
-                statusDiv.addClass('warning');
-                statusDiv.html('<strong>In Progress:</strong> ' + totalKicks + ' kicks recorded. ' + 
-                               'Goal is ' + kicksThreshold + ' kicks within 2 hours.');
-            }
-        } */
         function updateStatus(totalKicks) {
             statusDiv.removeClass('good warning');
             
