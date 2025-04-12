@@ -465,6 +465,10 @@
         padding: 12px;
     }
 
+    .baby-kick-tracker-pregnancy-stats {
+        flex-direction: column;
+    }
+
     .baby-kick-tracker-stat {
         min-width: 70px;
         padding: 10px;
