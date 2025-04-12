@@ -3,7 +3,7 @@
  * Baby Kick Tracker Admin Dashboard Template
  */
 ?>
-<div class="wrap">
+<div class="admin-side-tracker">
     <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
     <?php if ($this->is_admin): ?>

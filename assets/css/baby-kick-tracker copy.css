@@ -1,0 +1,412 @@
+/* Baby Kick Tracker Container */
+.baby-kick-tracker-container {
+    font-family: 'Nunito', 'Arial Rounded MT Bold', 'Arial', sans-serif;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 15px;
+    border-radius: 20px;
+    background-color: white;
+    box-shadow: 0 5px 20px rgba(237, 119, 193, 0.1);
+}
+
+/* Header styling */
+.baby-kick-tracker-header {
+    text-align: center;
+    padding: 15px 0;
+    margin-bottom: 20px;
+    border-bottom: 3px dashed #ffd1e3;
+    position: relative;
+}
+
+.baby-kick-tracker-header::before,
+.baby-kick-tracker-header::after {
+    content: "👶";
+    position: absolute;
+    bottom: -15px;
+    font-size: 24px;
+}
+
+.baby-kick-tracker-header::before {
+    left: 10%;
+}
+
+.baby-kick-tracker-header::after {
+    right: 10%;
+}
+
+.baby-kick-tracker-header h2 {
+    color: #ff99c8;
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.baby-kick-tracker-header p {
+    color: #888;
+    font-size: 1rem;
+}
+
+/* Form styling */
+.baby-kick-tracker-form {
+    padding: 15px;
+}
+
+.baby-kick-tracker-field {
+    margin-bottom: 15px;
+    background-color: #fafafa;
+    padding: 12px;
+    border-radius: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.baby-kick-tracker-field label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #666;
+}
+
+.baby-kick-tracker-field input[type="number"] {
+    width: 100%;
+    padding: 10px 15px;
+    border: 2px solid #ffd1e3;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.baby-kick-tracker-field input[type="number"]:focus {
+    outline: none;
+    border-color: #ff99c8;
+    box-shadow: 0 0 0 3px rgba(255, 153, 200, 0.3);
+}
+
+/* Timer styling */
+.baby-kick-tracker-timer {
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 10px;
+    margin: 15px 0;
+    color: #666;
+    font-weight: bold;
+    background-color: #f0f8ff;
+    border-radius: 12px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Button styling */
+.baby-kick-tracker-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+@media (min-width: 480px) {
+    .baby-kick-tracker-buttons {
+        flex-direction: row;
+    }
+}
+
+.baby-kick-tracker-button {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.baby-kick-tracker-button::before {
+    margin-right: 8px;
+    font-size: 1.2em;
+}
+
+.baby-kick-tracker-button.start {
+    background-color: #a9def9;
+    color: #1a7db5;
+}
+
+.baby-kick-tracker-button.start:hover {
+    background-color: #87c4e7;
+}
+
+.baby-kick-tracker-button.start::before {
+    content: "⏱️";
+}
+
+.baby-kick-tracker-button.add {
+    background-color: #ff99c8;
+    color: white;
+}
+
+.baby-kick-tracker-button.add:hover {
+    background-color: #e66a9e;
+}
+
+.baby-kick-tracker-button.add::before {
+    content: "👣";
+}
+
+/* Status styling */
+.baby-kick-tracker-status {
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+.baby-kick-tracker-status.warning {
+    background-color: #fff3d4;
+    border-left: 5px solid #ffd166;
+    color: #856404;
+}
+
+.baby-kick-tracker-status.success {
+    background-color: #d4edda;
+    border-left: 5px solid #28a745;
+    color: #155724;
+}
+
+.baby-kick-tracker-status strong {
+    font-weight: bold;
+}
+
+/* Summary styling */
+.baby-kick-tracker-summary {
+    background-color: #fcf6bd;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.baby-kick-tracker-summary h3 {
+    color: #e6a800;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+}
+
+.baby-kick-tracker-summary p {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+/* Pregnancy info styling */
+.baby-kick-tracker-pregnancy-info {
+    border-top: 2px dashed #ffd1e3;
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+.baby-kick-tracker-pregnancy-info h3 {
+    text-align: center;
+    color: #ff99c8;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    position: relative;
+}
+
+.baby-kick-tracker-pregnancy-info h3::before,
+.baby-kick-tracker-pregnancy-info h3::after {
+    content: "💖";
+    font-size: 18px;
+    margin: 0 10px;
+    color: #ff99c8;
+}
+
+.baby-kick-tracker-pregnancy-stats {
+    display: flex;
+    justify-content: space-around;
+    flex-admin-side-tracker: admin-side-tracker;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.baby-kick-tracker-stat {
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+    padding: 12px;
+    background-color: #ffd1e3;
+    border-radius: 15px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+}
+
+.baby-kick-tracker-stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e66a9e;
+}
+
+.baby-kick-tracker-stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.baby-kick-tracker-due-date {
+    background-color: #d0f0ff;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.baby-kick-tracker-due-date strong {
+    color: #1a7db5;
+}
+
+.baby-kick-tracker-due-date p {
+    margin-top: 5px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.baby-kick-tracker-weekly-info {
+    margin-top: 20px;
+}
+
+.baby-kick-tracker-weekly-info h4 {
+    text-align: center;
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    position: relative;
+}
+
+.baby-kick-tracker-weekly-info h4::after {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 3px;
+    background-color: #a9def9;
+    margin: 8px auto 0;
+    border-radius: 2px;
+}
+
+.baby-kick-tracker-info-card {
+    background-color: white;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    border-left: 5px solid #a9def9;
+}
+
+.baby-kick-tracker-info-card h5 {
+    color: #1a7db5;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.baby-kick-tracker-info-card p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.baby-kick-tracker-quote {
+    font-style: italic;
+    text-align: center;
+    color: #888;
+    padding: 10px;
+    margin: 15px 0;
+}
+
+.baby-kick-tracker-quote blockquote {
+    position: relative;
+    padding: 0 20px;
+}
+
+.baby-kick-tracker-quote blockquote::before,
+.baby-kick-tracker-quote blockquote::after {
+    content: '"';
+    font-size: 2rem;
+    color: #ffd1e3;
+    position: relative;
+    line-height: 0;
+}
+
+/* Responsive adjustments for very narrow screens */
+@media (max-width: 350px) {
+    .baby-kick-tracker-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .baby-kick-tracker-header p {
+        font-size: 0.9rem;
+    }
+
+    .baby-kick-tracker-field {
+        padding: 10px;
+    }
+
+    .baby-kick-tracker-stat {
+        min-width: 70px;
+        padding: 8px;
+    }
+
+    .baby-kick-tracker-stat-value {
+        font-size: 1.2rem;
+    }
+
+    .baby-kick-tracker-info-card {
+        padding: 12px;
+    }
+
+    .baby-kick-tracker-button {
+        padding: 10px 15px;
+    }
+}
+
+/* Animations and decorative elements */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.baby-kick-tracker-header h2::after {
+    content: "🍼";
+    display: inline-block;
+    margin-left: 10px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.baby-kick-tracker-due-date::before {
+    content: "🗓️";
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Accessibility improvements */
+input:focus,
+button:focus {
+    outline: 3px solid rgba(169, 222, 249, 0.5);
+}
+
+/* Print styles */
+@media print {
+    .baby-kick-tracker-container {
+        box-shadow: none;
+    }
+
+    .baby-kick-tracker-buttons {
+        display: none;
+    }
+}

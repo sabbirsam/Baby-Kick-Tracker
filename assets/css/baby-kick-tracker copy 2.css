@@ -1,6 +1,7 @@
 /* Baby Kick Tracker Container */
 .baby-kick-tracker-container {
     font-family: 'Nunito', 'Arial Rounded MT Bold', 'Arial', sans-serif;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
     border-radius: 24px;

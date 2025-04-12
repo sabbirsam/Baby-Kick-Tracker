@@ -3,7 +3,7 @@
  * Baby Kick Tracker Admin Reports Template
  */
 ?>
-<div class="wrap">
+<div class="admin-side-tracker">
     <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
     
     <div class="baby-kick-admin-container">
@@ -275,7 +275,7 @@
                         
                         <!-- Message Modal -->
                         <div id="notification-message-modal" style="display:none;">
-                            <div id="notification-message-content" style="white-space: pre-wrap;"></div>
+                            <div id="notification-message-content" style="white-space: pre-admin-side-tracker;"></div>
                         </div>
                         <script>
                             jQuery(document).ready(function($) {

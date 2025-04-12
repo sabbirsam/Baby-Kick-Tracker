@@ -691,7 +691,7 @@ class Baby_Kick_Tracker {
     }
 
     // Add this function to the class:
-    public function get_weekly_pregnancy_info($week) {
+    /* public function get_weekly_pregnancy_info($week) {
         $info = array(
             // First trimester
             1 => array(
@@ -773,7 +773,264 @@ class Baby_Kick_Tracker {
         }
         
         return $info[$closest_week] ?? $info[1];
+    } */
+
+    public function get_weekly_pregnancy_info($week) {
+        $info = array(
+            // First trimester
+            1 => array(
+                'baby' => 'Your baby is a tiny cluster of cells called a blastocyst.',
+                'mother' => 'You may not feel pregnant yet, but hormonal changes have begun.',
+                'tip' => 'Start taking prenatal vitamins with folic acid.',
+                'quote' => 'Every journey begins with a single step.'
+            ),
+            2 => array(
+                'baby' => 'Your baby is now called an embryo and is implanting into your uterine lining.',
+                'mother' => 'You might miss your period and experience mild cramping or spotting.',
+                'tip' => 'Avoid alcohol, smoking, and limit caffeine intake.',
+                'quote' => 'The miracle of life begins in the smallest of ways.'
+            ),
+            3 => array(
+                'baby' => 'Your baby\'s neural tube, which will become the brain and spinal cord, is forming.',
+                'mother' => 'Pregnancy hormones may cause breast tenderness and fatigue.',
+                'tip' => 'Make an appointment with your healthcare provider for prenatal care.',
+                'quote' => 'Great things often have small beginnings.'
+            ),
+            4 => array(
+                'baby' => 'Your baby\'s heart begins to form and beat.',
+                'mother' => 'You might experience morning sickness and fatigue.',
+                'tip' => 'Get plenty of rest and stay hydrated.',
+                'quote' => 'The most precious jewels you\'ll ever have around your neck are the arms of your child.'
+            ),
+            5 => array(
+                'baby' => 'Your baby\'s eyes, ears, and nose begin to develop. Tiny limb buds appear.',
+                'mother' => 'Morning sickness may intensify. Your blood volume begins to increase.',
+                'tip' => 'Try eating ginger candies or drinking ginger tea to help with nausea.',
+                'quote' => 'A mother\'s love begins long before birth.'
+            ),
+            6 => array(
+                'baby' => 'Your baby\'s heart is beating about 110 times per minute. Facial features are becoming more defined.',
+                'mother' => 'You may notice emotional changes and food aversions or cravings.',
+                'tip' => 'Stay active with gentle exercise like walking.',
+                'quote' => 'Pregnancy is the happiest reason to feel really sick.'
+            ),
+            7 => array(
+                'baby' => 'Your baby\'s arms and legs are growing longer, and fingers and toes are forming.',
+                'mother' => 'Your uterus is growing, and you may need to urinate more frequently.',
+                'tip' => 'Eat plenty of fiber to prevent constipation.',
+                'quote' => 'You never understand life until it grows inside of you.'
+            ),
+            8 => array(
+                'baby' => 'All essential organs have begun to form. Tiny fingers and toes are developing.',
+                'mother' => 'Your uterus has doubled in size. You may feel bloated and emotional.',
+                'tip' => 'Eat small, frequent meals to help with nausea.',
+                'quote' => 'A baby fills a place in your heart that you never knew was empty.'
+            ),
+            9 => array(
+                'baby' => 'Your baby is now officially a fetus. External genitalia start to form.',
+                'mother' => 'Your waistline may be thickening. First trimester symptoms continue.',
+                'tip' => 'Consider sharing your pregnancy news with close family and friends.',
+                'quote' => 'The love for a child is beyond measure.'
+            ),
+            10 => array(
+                'baby' => 'Your baby can now move around and may swallow small amounts of amniotic fluid.',
+                'mother' => 'You may notice subtle changes in your waistline and breasts.',
+                'tip' => 'Start researching childcare options if you plan to return to work.',
+                'quote' => 'Carrying a baby is the first act of protecting them.'
+            ),
+            11 => array(
+                'baby' => 'Your baby\'s head makes up about half of its length. Tooth buds are forming.',
+                'mother' => 'You might feel a bit more energetic as the first trimester comes to an end.',
+                'tip' => 'Consider prenatal yoga to strengthen your body and reduce stress.',
+                'quote' => 'Growing a baby is like planting a seed—one day at a time.'
+            ),
+            12 => array(
+                'baby' => 'Your baby is about the size of a lime and can make facial expressions.',
+                'mother' => 'First trimester symptoms may ease. You might have a visible bump.',
+                'tip' => 'Start doing Kegel exercises to strengthen pelvic floor muscles.',
+                'quote' => 'Pregnancy is the only time when you can carry your heart outside your body.'
+            ),
+            13 => array(
+                'baby' => 'Your baby\'s intestines are moving into place, and vocal cords are forming.',
+                'mother' => 'You may feel more energetic as you enter the second trimester.',
+                'tip' => 'Start researching birthing options and creating a birth plan.',
+                'quote' => 'The best things in life are worth waiting for.'
+            ),
+            14 => array(
+                'baby' => 'Your baby\'s ears are moving to their final position, and they can make facial expressions.',
+                'mother' => 'Your energy levels may increase, and morning sickness could subside.',
+                'tip' => 'Consider starting a pregnancy journal to document your journey.',
+                'quote' => 'A baby is brewing—a small miracle each day.'
+            ),
+            15 => array(
+                'baby' => 'Your baby can sense light and is developing taste buds. They may suck their thumb.',
+                'mother' => 'You might notice your hair and nails growing faster and thicker.',
+                'tip' => 'Start moisturizing your belly to reduce stretch marks.',
+                'quote' => 'Happiness is on the way, growing stronger every day.'
+            ),
+            16 => array(
+                'baby' => 'Your baby can make sucking motions and may respond to loud sounds.',
+                'mother' => 'You may feel more energetic and experience the "pregnancy glow".',
+                'tip' => 'Start sleeping on your side to improve circulation.',
+                'quote' => 'Being pregnant is like having your very own science lab—in your belly!'
+            ),
+            17 => array(
+                'baby' => 'Your baby\'s skeleton is changing from cartilage to bone. The umbilical cord is growing stronger.',
+                'mother' => 'You may start to feel fluttering movements ("quickening").',
+                'tip' => 'Start planning your baby registry if you\'re having a shower.',
+                'quote' => 'Two hearts beating as one—what a wonderful miracle.'
+            ),
+            18 => array(
+                'baby' => 'Your baby\'s ears are now in their final position, and they can hear your voice.',
+                'mother' => 'Your bump is becoming more noticeable. You might feel baby movements.',
+                'tip' => 'Talk and sing to your baby—they can hear you now!',
+                'quote' => 'Sometimes the smallest things take up the most room in your heart.'
+            ),
+            19 => array(
+                'baby' => 'Your baby is developing a protective coating called vernix caseosa.',
+                'mother' => 'You may notice a dark line (linea nigra) forming on your abdomen.',
+                'tip' => 'Stay active with pregnancy-safe exercises like swimming.',
+                'quote' => 'The wonder of creating life is the greatest adventure.'
+            ),
+            20 => array(
+                'baby' => 'Your baby is about the size of a banana. You might feel movement.',
+                'mother' => 'Your belly is growing noticeably. You may have more energy.',
+                'tip' => 'Consider signing up for prenatal classes.',
+                'quote' => 'A baby is something you carry for nine months, in your arms for three years, and in your heart forever.'
+            ),
+            21 => array(
+                'baby' => 'Your baby\'s taste buds are forming, and they may taste what you eat through amniotic fluid.',
+                'mother' => 'You might feel more energetic and excited as you feel more movement.',
+                'tip' => 'Continue to exercise moderately to prepare for labor.',
+                'quote' => 'A child is the anchor that holds a mother to life.'
+            ),
+            22 => array(
+                'baby' => 'Your baby\'s eyebrows and eyelids are fully formed. They may respond to sounds outside.',
+                'mother' => 'You may notice stretch marks developing and experience backaches.',
+                'tip' => 'Use a pregnancy pillow to help you sleep more comfortably.',
+                'quote' => 'Pregnancy reveals the strength you never knew you had.'
+            ),
+            23 => array(
+                'baby' => 'Your baby can now recognize your voice and may respond to it.',
+                'mother' => 'Your uterus reaches to about 1.5 inches above your navel.',
+                'tip' => 'Start researching pediatricians in your area.',
+                'quote' => 'The most beautiful things in life can\'t be seen, they must be felt.'
+            ),
+            24 => array(
+                'baby' => 'Your baby\'s face is fully formed and they have a regular schedule of sleeping and waking.',
+                'mother' => 'You may experience backaches and leg cramps.',
+                'tip' => 'Stay active with gentle exercise like swimming or yoga.',
+                'quote' => 'Every kick reminds me that I am never alone.'
+            ),
+            25 => array(
+                'baby' => 'Your baby is practicing breathing motions and can respond to touch.',
+                'mother' => 'You may notice swelling in your ankles and feet by the end of the day.',
+                'tip' => 'Elevate your feet when sitting to reduce swelling.',
+                'quote' => 'There is only one pretty child in the world, and every mother has it.'
+            ),
+            26 => array(
+                'baby' => 'Your baby\'s eyes begin to open, and they may have hair on their head.',
+                'mother' => 'You may experience Braxton Hicks contractions occasionally.',
+                'tip' => 'Start doing research about breastfeeding if you plan to nurse.',
+                'quote' => 'Pregnancy is the most precious period of a woman\'s life.'
+            ),
+            27 => array(
+                'baby' => 'Your baby\'s brain is developing rapidly, and they can hiccup in the womb.',
+                'mother' => 'You may feel the baby moving more strongly and regularly.',
+                'tip' => 'Take a hospital tour if you plan to deliver at a hospital.',
+                'quote' => 'Making life is the greatest creative act of all.'
+            ),
+            28 => array(
+                'baby' => 'Your baby can open their eyes and has a regular sleep-wake cycle.',
+                'mother' => 'You may experience shortness of breath and Braxton Hicks contractions.',
+                'tip' => 'Practice different labor positions and breathing techniques.',
+                'quote' => 'The moment a child is born, the mother is also born.'
+            ),
+            29 => array(
+                'baby' => 'Your baby\'s bones are fully formed but still soft and flexible.',
+                'mother' => 'Your growing uterus may cause heartburn and shortness of breath.',
+                'tip' => 'Sleep with your upper body elevated to reduce heartburn.',
+                'quote' => 'Love begins when you feel the first kick.'
+            ),
+            30 => array(
+                'baby' => 'Your baby\'s brain is developing rapidly, with billions of neurons forming.',
+                'mother' => 'You may gain about a pound a week from now until delivery.',
+                'tip' => 'Prepare freezer meals for after baby arrives.',
+                'quote' => 'There\'s no way to be a perfect mother, but a million ways to be a good one.'
+            ),
+            31 => array(
+                'baby' => 'Your baby can turn their head from side to side and respond to light and sound.',
+                'mother' => 'You may feel more tired and have difficulty finding comfortable positions.',
+                'tip' => 'Consider hiring a doula for additional labor support.',
+                'quote' => 'A mother\'s arms are more comforting than anyone else\'s.'
+            ),
+            32 => array(
+                'baby' => 'Your baby is practicing breathing motions and gaining weight rapidly.',
+                'mother' => 'You may feel uncomfortable and have trouble sleeping.',
+                'tip' => 'Use pillows to support your growing belly while sleeping.',
+                'quote' => 'Your body knows what to do. Trust the process.'
+            ),
+            33 => array(
+                'baby' => 'Your baby\'s bones are hardening, except for the skull which remains soft for birth.',
+                'mother' => 'You may notice more Braxton Hicks contractions and have trouble finding comfortable positions.',
+                'tip' => 'Finalize your birth plan and discuss it with your healthcare provider.',
+                'quote' => 'To be pregnant is to be vitally alive, thoroughly woman, and distressingly inhabited.'
+            ),
+            34 => array(
+                'baby' => 'Your baby\'s central nervous system and lungs are maturing rapidly.',
+                'mother' => 'You may feel pressure on your pelvis as the baby settles lower.',
+                'tip' => 'Make sure your car seat is properly installed.',
+                'quote' => 'A mother\'s joy begins when new life is stirring inside.'
+            ),
+            35 => array(
+                'baby' => 'Your baby\'s kidneys are fully developed, and they\'re gaining about half a pound a week.',
+                'mother' => 'You may experience more frequent urination as baby drops lower.',
+                'tip' => 'Review the signs of labor with your partner.',
+                'quote' => 'The strength of a woman is not measured by the impact that all her hardships have had on her, but by the extent of her refusal to allow those hardships to dictate who she becomes.'
+            ),
+            36 => array(
+                'baby' => 'Your baby is nearly ready for birth. Their lungs are maturing.',
+                'mother' => 'You may feel very tired and have practice contractions.',
+                'tip' => 'Make sure your hospital bag is packed.',
+                'quote' => 'A mother\'s joy begins when new life is stirring inside her.'
+            ),
+            37 => array(
+                'baby' => 'Your baby is considered "full term." Their organs are ready to function outside the womb.',
+                'mother' => 'You may feel uncomfortable and anxious for labor to begin.',
+                'tip' => 'Try walking or gentle exercise to encourage baby to engage in the pelvis.',
+                'quote' => 'You\'re almost there. Every day brings you closer to meeting your baby.'
+            ),
+            38 => array(
+                'baby' => 'Your baby continues to shed vernix and lanugo. Their lungs continue to mature.',
+                'mother' => 'You may notice increased vaginal discharge and more frequent Braxton Hicks.',
+                'tip' => 'Rest as much as possible to prepare for labor and delivery.',
+                'quote' => 'The last few weeks are the hardest, but the reward is just around the corner.'
+            ),
+            39 => array(
+                'baby' => 'Your baby\'s brain and lungs continue to develop. They\'re running out of room to move.',
+                'mother' => 'You may feel very ready for pregnancy to be over. Any day now!',
+                'tip' => 'Keep monitoring baby\'s movements and report any changes to your doctor.',
+                'quote' => 'Life is tough, but so are you. You\'ve got this!'
+            ),
+            40 => array(
+                'baby' => 'Your baby is fully developed and ready to meet you!',
+                'mother' => 'You may feel ready for delivery. Any day now!',
+                'tip' => 'Rest and relax as much as possible.',
+                'quote' => 'You are stronger than you know, more capable than you ever dreamed.'
+            )
+        );
+        
+        // Find the closest week info available
+        $closest_week = 1;
+        foreach (array_keys($info) as $key_week) {
+            if ($week >= $key_week && $key_week > $closest_week) {
+                $closest_week = $key_week;
+            }
+        }
+        
+        return $info[$closest_week] ?? $info[1];
     }
+    
 
     
     // Render admin dashboard page
@@ -928,7 +1185,7 @@ class Baby_Kick_Tracker {
     // Render settings page
     /* public function render_settings_page() {
         ?>
-        <div class="wrap">
+        <div class="admin-side-tracker">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
             <form action="options.php" method="post">
                 <?php
@@ -960,7 +1217,7 @@ class Baby_Kick_Tracker {
        $user_options = $this->get_user_options($user_id);
 
        ?>
-       <div class="wrap">
+       <div class="admin-side-tracker">
            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
            
            <?php if ($this->is_admin): ?>
@@ -1006,7 +1263,7 @@ class Baby_Kick_Tracker {
         $user_options = $this->get_user_options($user_id);
 
         ?>
-        <div class="wrap">
+        <div class="admin-side-tracker">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
             
             <?php if ($this->is_admin): ?>

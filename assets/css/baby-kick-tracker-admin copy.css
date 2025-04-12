@@ -1,0 +1,181 @@
+/* Baby Kick Tracker Admin Styles */
+.baby-kick-admin-container {
+    max-width: 1200px;
+    margin: 20px 0;
+}
+
+.baby-kick-admin-card {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.baby-kick-admin-card-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.baby-kick-admin-card-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #23282d;
+}
+
+.baby-kick-admin-stats {
+    display: flex;
+    flex-admin-side-tracker: admin-side-tracker;
+    margin: 0 -10px;
+}
+
+.baby-kick-admin-stat-card {
+    flex: 1 1 200px;
+    margin: 0 10px 20px;
+    padding: 15px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.baby-kick-admin-stat-title {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.baby-kick-admin-stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #343a40;
+}
+
+.baby-kick-admin-chart-container {
+    height: 300px;
+    margin-top: 20px;
+}
+
+.baby-kick-admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.baby-kick-admin-table th,
+.baby-kick-admin-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.baby-kick-admin-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.baby-kick-admin-pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.baby-kick-admin-pagination .page-numbers {
+    padding: 5px 10px;
+    margin: 0 2px;
+    border-radius: 3px;
+    background-color: #f8f9fa;
+    color: #23282d;
+    text-decoration: none;
+}
+
+.baby-kick-admin-pagination .page-numbers.current {
+    background-color: #0073aa;
+    color: #fff;
+}
+
+
+/* New  */
+.baby-kick-tracker-pregnancy-info {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 30px;
+    border-top: 3px solid #ff6b81;
+}
+
+.baby-kick-tracker-pregnancy-stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.baby-kick-tracker-stat {
+    padding: 10px;
+}
+
+.baby-kick-tracker-stat-value {
+    font-size: 2em;
+    font-weight: bold;
+    color: #ff6b81;
+    display: block;
+}
+
+.baby-kick-tracker-stat-label {
+    font-size: 0.9em;
+    color: #777;
+}
+
+.baby-kick-tracker-due-date {
+    background-color: #fff;
+    border-radius: 6px;
+    padding: 15px;
+    margin: 15px 0;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.baby-kick-tracker-weekly-info {
+    margin-top: 20px;
+}
+
+.baby-kick-tracker-info-card {
+    background-color: #fff;
+    border-left: 4px solid #ff6b81;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.baby-kick-tracker-info-card h5 {
+    color: #ff6b81;
+    margin: 0 0 5px 0;
+}
+
+.baby-kick-tracker-quote {
+    font-style: italic;
+    text-align: center;
+    padding: 15px;
+    color: #555;
+}
+
+.baby-kick-tracker-quote blockquote {
+    font-size: 1.1em;
+    border-left: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Add to baby-kick-tracker-admin.css */
+.baby-kick-admin-card-subheader {
+    padding: 10px 20px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 20px;
+}
+
+.baby-kick-admin-card-subheader h3 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #555;
+}
