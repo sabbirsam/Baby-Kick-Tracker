@@ -15,9 +15,19 @@ if (!defined('ABSPATH')) {
 }
 
 class Baby_Kick_Tracker {
+
+    private $current_user_id;
+    private $is_admin;
     
     // Constructor - setup hooks and filters
     public function __construct() {
+
+        add_action('init', array($this, 'setup_user_data'));
+
+         // Get current user info
+        // $this->current_user_id = get_current_user_id();
+        // $this->is_admin = current_user_can('administrator');
+        
         // Register activation and deactivation hooks
         register_activation_hook(__FILE__, array($this, 'activate_plugin'));
         register_deactivation_hook(__FILE__, array($this, 'deactivate_plugin'));
@@ -45,6 +55,12 @@ class Baby_Kick_Tracker {
         // Cron event hooks
         add_action('baby_kick_tracker_hourly_check', array($this, 'hourly_check_kicks'));
         add_action('baby_kick_tracker_daily_summary', array($this, 'send_daily_summary'));
+    }
+
+    public function setup_user_data() {
+        // Now WordPress is fully loaded and user functions are available
+        $this->current_user_id = get_current_user_id();
+        $this->is_admin = current_user_can('administrator');
     }
     
     // Plugin activation
@@ -88,9 +104,32 @@ class Baby_Kick_Tracker {
         // Flush rewrite rules
         flush_rewrite_rules();
     }
+
+    // Add function to get user-specific options
+    public function get_user_options($user_id = null) {
+        if ($user_id === null) {
+            $user_id = $this->current_user_id;
+        }
+        
+        // Get global defaults
+        $default_options = get_option('baby_kick_tracker_options', array());
+        
+        // If user-specific settings exist, merge them
+        $user_options = get_user_meta($user_id, 'baby_kick_tracker_user_options', true);
+        if (!empty($user_options) && is_array($user_options)) {
+            return array_merge($default_options, $user_options);
+        }
+        
+        return $default_options;
+    }
     
+    // Add function to save user-specific options
+    public function save_user_options($user_id, $options) {
+        update_user_meta($user_id, 'baby_kick_tracker_user_options', $options);
+    }
+
     // Create database tables
-    private function create_database_tables() {
+    /* private function create_database_tables() {
         global $wpdb;
         
         $charset_collate = $wpdb->get_charset_collate();
@@ -131,6 +170,61 @@ class Baby_Kick_Tracker {
             message longtext,
             PRIMARY KEY  (id),
             KEY session_id (session_id)
+        ) $charset_collate;";
+        
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql_sessions);
+        dbDelta($sql_kicks);
+        dbDelta($sql_notifications);
+    } */
+
+    private function create_database_tables() {
+        global $wpdb;
+        
+        $charset_collate = $wpdb->get_charset_collate();
+        
+        // Update table for kick sessions to include user_id
+        $table_sessions = $wpdb->prefix . 'baby_kick_sessions';
+        $sql_sessions = "CREATE TABLE $table_sessions (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            user_id bigint(20) NOT NULL,
+            start_time datetime NOT NULL,
+            end_time datetime DEFAULT NULL,
+            total_kicks int(11) NOT NULL DEFAULT 0,
+            status varchar(50) DEFAULT 'in_progress',
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY user_id (user_id)
+        ) $charset_collate;";
+        
+        // Update table for individual kicks to include user_id
+        $table_kicks = $wpdb->prefix . 'baby_kick_records';
+        $sql_kicks = "CREATE TABLE $table_kicks (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            session_id mediumint(9) NOT NULL,
+            user_id bigint(20) NOT NULL,
+            kick_time datetime NOT NULL,
+            kick_count int(11) NOT NULL DEFAULT 1,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY session_id (session_id),
+            KEY user_id (user_id)
+        ) $charset_collate;";
+        
+        // Update table for notification logs to include user_id
+        $table_notifications = $wpdb->prefix . 'baby_kick_notifications';
+        $sql_notifications = "CREATE TABLE $table_notifications (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            session_id mediumint(9) NOT NULL,
+            user_id bigint(20) NOT NULL,
+            notification_type varchar(50) NOT NULL,
+            sent_at datetime DEFAULT CURRENT_TIMESTAMP,
+            recipient varchar(255) NOT NULL,
+            status varchar(50) DEFAULT 'sent',
+            message longtext,
+            PRIMARY KEY  (id),
+            KEY session_id (session_id),
+            KEY user_id (user_id)
         ) $charset_collate;";
         
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -180,8 +274,11 @@ class Baby_Kick_Tracker {
     }
     
     // Register settings
-    public function register_settings() {
-        register_setting('baby_kick_tracker_settings', 'baby_kick_tracker_options');
+    /* public function register_settings() {
+        // register_setting('baby_kick_tracker_settings', 'baby_kick_tracker_options');
+        register_setting('baby_kick_tracker_settings', 'baby_kick_tracker_user_options', array(
+            'sanitize_callback' => array($this, 'sanitize_settings')
+        ));
         
         add_settings_section(
             'baby_kick_tracker_main_settings',
@@ -239,7 +336,83 @@ class Baby_Kick_Tracker {
         
         add_settings_field(
             'admin_email',
-            'Admin Email',
+            'Father\'s Email',
+            array($this, 'admin_email_callback'),
+            'baby_kick_tracker_settings',
+            'baby_kick_tracker_main_settings'
+        );
+        
+        add_settings_field(
+            'kicks_threshold',
+            'Kicks Threshold (2 hours)',
+            array($this, 'kicks_threshold_callback'),
+            'baby_kick_tracker_settings',
+            'baby_kick_tracker_main_settings'
+        );
+    } */
+
+    public function register_settings() {
+        register_setting('baby_kick_tracker_settings', 'baby_kick_tracker_user_options', array(
+            'sanitize_callback' => array($this, 'sanitize_settings')
+        ));
+        
+        add_settings_section(
+            'baby_kick_tracker_main_settings',
+            'Main Settings',
+            array($this, 'settings_section_callback'),
+            'baby_kick_tracker_settings'
+        );
+    
+        add_settings_section(
+            'baby_kick_tracker_pregnancy_settings',
+            'Pregnancy Details',
+            array($this, 'pregnancy_settings_section_callback'),
+            'baby_kick_tracker_settings'
+        );
+    
+        add_settings_field(
+            'assessment_period_hours',
+            'Assessment Period (hours)',
+            array($this, 'assessment_period_hours_callback'),
+            'baby_kick_tracker_settings',
+            'baby_kick_tracker_main_settings'
+        );
+    
+        add_settings_field(
+            'mother_weight',
+            'Mother\'s Current Weight (kg)',
+            array($this, 'mother_weight_callback'),
+            'baby_kick_tracker_settings',
+            'baby_kick_tracker_pregnancy_settings'
+        );
+        
+        add_settings_field(
+            'pre_pregnancy_weight',
+            'Pre-Pregnancy Weight (kg)',
+            array($this, 'pre_pregnancy_weight_callback'),
+            'baby_kick_tracker_settings',
+            'baby_kick_tracker_pregnancy_settings'
+        );
+    
+        add_settings_field(
+            'period_miss_date',
+            'Last Period Date',
+            array($this, 'period_miss_date_callback'),
+            'baby_kick_tracker_settings',
+            'baby_kick_tracker_pregnancy_settings'
+        );
+        
+        add_settings_field(
+            'mother_email',
+            'Mother\'s Email',
+            array($this, 'mother_email_callback'),
+            'baby_kick_tracker_settings',
+            'baby_kick_tracker_main_settings'
+        );
+        
+        add_settings_field(
+            'admin_email',
+            'Father\'s Email',
             array($this, 'admin_email_callback'),
             'baby_kick_tracker_settings',
             'baby_kick_tracker_main_settings'
@@ -253,16 +426,55 @@ class Baby_Kick_Tracker {
             'baby_kick_tracker_main_settings'
         );
     }
+
+    public function sanitize_settings($input) {
+        // Process the input as before
+        
+        // Save to the current user's meta instead of global options
+        if ($this->current_user_id) {
+            $this->save_user_options($this->current_user_id, $input);
+        }
+        
+        return $input;
+    }
+
+    public function users_dropdown_callback() {
+        if (!$this->is_admin) {
+            return;
+        }
+        
+        $users = get_users(array('role__not_in' => array('administrator')));
+        $selected_user = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
+        
+        echo '<select id="baby_kick_tracker_user" name="user_id" onchange="this.form.submit()">';
+        echo '<option value="0">All Users (Summary)</option>';
+        
+        foreach ($users as $user) {
+            echo '<option value="' . esc_attr($user->ID) . '" ' . selected($selected_user, $user->ID, false) . '>' . 
+                esc_html($user->display_name) . ' (' . esc_html($user->user_email) . ')</option>';
+        }
+        
+        echo '</select>';
+    }
     
     // Settings section callback
     public function settings_section_callback() {
         echo '<p>Configure the Baby Kick Tracker settings below:</p>';
     }
 
-    public function assessment_period_hours_callback() {
+    /* public function assessment_period_hours_callback() {
         $options = get_option('baby_kick_tracker_options');
         $period = isset($options['assessment_period_hours']) ? intval($options['assessment_period_hours']) : 2;
         echo '<input type="number" id="assessment_period_hours" name="baby_kick_tracker_options[assessment_period_hours]" value="' . esc_attr($period) . '" class="small-text" min="1" max="24" />';
+        echo '<p class="description">Time period for counting kicks (1-24 hours).</p>';
+    } */
+
+    public function assessment_period_hours_callback() {
+        $user_id = $this->is_admin && isset($_GET['user_id']) ? intval($_GET['user_id']) : $this->current_user_id;
+        $options = $this->get_user_options($user_id);
+        $period = isset($options['assessment_period_hours']) ? intval($options['assessment_period_hours']) : 2;
+        
+        echo '<input type="number" id="assessment_period_hours" name="baby_kick_tracker_user_options[assessment_period_hours]" value="' . esc_attr($period) . '" class="small-text" min="1" max="24" />';
         echo '<p class="description">Time period for counting kicks (1-24 hours).</p>';
     }
 
@@ -270,27 +482,115 @@ class Baby_Kick_Tracker {
         echo '<p>Enter pregnancy details to track progress and calculate the estimated delivery date:</p>';
     }
     
-    public function period_miss_date_callback() {
+    /* public function period_miss_date_callback() {
         $options = get_option('baby_kick_tracker_options');
         echo '<input type="date" id="period_miss_date" name="baby_kick_tracker_options[period_miss_date]" value="' . esc_attr($options['period_miss_date'] ?? '') . '" />';
         echo '<p class="description">First day of last menstrual period.</p>';
+    } */
+
+    public function period_miss_date_callback() {
+        $user_id = $this->is_admin && isset($_GET['user_id']) ? intval($_GET['user_id']) : $this->current_user_id;
+        $options = $this->get_user_options($user_id);
+        $date = isset($options['period_miss_date']) ? $options['period_miss_date'] : '';
+        
+        echo '<input type="date" id="period_miss_date" name="baby_kick_tracker_user_options[period_miss_date]" value="' . esc_attr($date) . '" />';
+        echo '<p class="description">First day of last menstrual period.</p>';
     }
     
-    public function mother_weight_callback() {
+    /* public function mother_weight_callback() {
         $options = get_option('baby_kick_tracker_options');
         echo '<input type="number" step="0.1" id="mother_weight" name="baby_kick_tracker_options[mother_weight]" value="' . esc_attr($options['mother_weight'] ?? '') . '" class="regular-text" />';
         echo '<p class="description">Current weight in kilograms.</p>';
+    } */
+    public function mother_weight_callback() {
+        $user_id = $this->is_admin && isset($_GET['user_id']) ? intval($_GET['user_id']) : $this->current_user_id;
+        $options = $this->get_user_options($user_id);
+        $weight = isset($options['mother_weight']) ? $options['mother_weight'] : '';
+        
+        echo '<input type="number" step="0.1" id="mother_weight" name="baby_kick_tracker_user_options[mother_weight]" value="' . esc_attr($weight) . '" class="regular-text" />';
+        echo '<p class="description">Current weight in kilograms.</p>';
     }
+
     
-    public function pre_pregnancy_weight_callback() {
+    /* public function pre_pregnancy_weight_callback() {
         $options = get_option('baby_kick_tracker_options');
         echo '<input type="number" step="0.1" id="pre_pregnancy_weight" name="baby_kick_tracker_options[pre_pregnancy_weight]" value="' . esc_attr($options['pre_pregnancy_weight'] ?? '') . '" class="regular-text" />';
         echo '<p class="description">Weight before pregnancy in kilograms.</p>';
+    } */
+
+    public function pre_pregnancy_weight_callback() {
+        $user_id = $this->is_admin && isset($_GET['user_id']) ? intval($_GET['user_id']) : $this->current_user_id;
+        $options = $this->get_user_options($user_id);
+        $weight = isset($options['pre_pregnancy_weight']) ? $options['pre_pregnancy_weight'] : '';
+        
+        echo '<input type="number" step="0.1" id="pre_pregnancy_weight" name="baby_kick_tracker_user_options[pre_pregnancy_weight]" value="' . esc_attr($weight) . '" class="regular-text" />';
+        echo '<p class="description">Weight before pregnancy in kilograms.</p>';
     }
+
     
     // Add this function to calculate and display pregnancy details:
-    public function get_pregnancy_details() {
+    /* public function get_pregnancy_details($user_id = null) {
+
+        if ($user_id === null) {
+            $user_id = $this->current_user_id;
+        }
+        
         $options = get_option('baby_kick_tracker_options');
+        $period_miss_date = isset($options['period_miss_date']) && !empty($options['period_miss_date']) ? 
+                           $options['period_miss_date'] : null;
+        
+        if (!$period_miss_date) {
+            return array(
+                'weeks' => 0,
+                'days' => 0,
+                'due_date' => null,
+                'remaining_days' => 0,
+                'remaining_weeks' => 0,
+                'trimester' => ''
+            );
+        }
+        
+        // Calculate pregnancy duration
+        $period_date = new DateTime($period_miss_date);
+        $current_date = new DateTime(current_time('Y-m-d'));
+        $interval = $period_date->diff($current_date);
+        
+        // Calculate due date (280 days from LMP)
+        $due_date = clone $period_date;
+        $due_date->add(new DateInterval('P280D'));
+        
+        // Calculate remaining time
+        $remaining_interval = $current_date->diff($due_date);
+        
+        // Calculate weeks and days
+        $total_days = $interval->days;
+        $weeks = floor($total_days / 7);
+        $days = $total_days % 7;
+        
+        // Determine trimester
+        $trimester = 'First';
+        if ($weeks >= 13 && $weeks < 27) {
+            $trimester = 'Second';
+        } elseif ($weeks >= 27) {
+            $trimester = 'Third';
+        }
+        
+        return array(
+            'weeks' => $weeks,
+            'days' => $days,
+            'due_date' => $due_date->format('F j, Y'),
+            'remaining_days' => $remaining_interval->days,
+            'remaining_weeks' => floor($remaining_interval->days / 7),
+            'trimester' => $trimester
+        );
+    } */
+
+    public function get_pregnancy_details($user_id = null) {
+        if ($user_id === null) {
+            $user_id = $this->current_user_id;
+        }
+        
+        $options = $this->get_user_options($user_id);
         $period_miss_date = isset($options['period_miss_date']) && !empty($options['period_miss_date']) ? 
                            $options['period_miss_date'] : null;
         
@@ -342,23 +642,51 @@ class Baby_Kick_Tracker {
 
     
     // Mother email field callback
-    public function mother_email_callback() {
+    /* public function mother_email_callback() {
         $options = get_option('baby_kick_tracker_options');
         echo '<input type="email" id="mother_email" name="baby_kick_tracker_options[mother_email]" value="' . esc_attr($options['mother_email']) . '" class="regular-text" />';
         echo '<p class="description">Enter the mother\'s email address for notifications.</p>';
+    } */
+
+    public function mother_email_callback() {
+        $user_id = $this->is_admin && isset($_GET['user_id']) ? intval($_GET['user_id']) : $this->current_user_id;
+        $options = $this->get_user_options($user_id);
+        $email = isset($options['mother_email']) ? $options['mother_email'] : '';
+        
+        echo '<input type="email" id="mother_email" name="baby_kick_tracker_user_options[mother_email]" value="' . esc_attr($email) . '" class="regular-text" />';
+        echo '<p class="description">Enter the mother\'s email address for notifications.</p>';
     }
+
     
     // Admin email field callback
-    public function admin_email_callback() {
+    /* public function admin_email_callback() {
         $options = get_option('baby_kick_tracker_options');
         echo '<input type="email" id="admin_email" name="baby_kick_tracker_options[admin_email]" value="' . esc_attr($options['admin_email']) . '" class="regular-text" />';
         echo '<p class="description">Enter the admin email address for notifications.</p>';
+    } */
+
+    public function admin_email_callback() {
+        $user_id = $this->is_admin && isset($_GET['user_id']) ? intval($_GET['user_id']) : $this->current_user_id;
+        $options = $this->get_user_options($user_id);
+        $email = isset($options['admin_email']) ? $options['admin_email'] : get_option('admin_email');
+        
+        echo '<input type="email" id="admin_email" name="baby_kick_tracker_user_options[admin_email]" value="' . esc_attr($email) . '" class="regular-text" />';
+        echo '<p class="description">Enter the father\'s email address for notifications.</p>';
     }
     
     // Kicks threshold field callback
-    public function kicks_threshold_callback() {
+    /* public function kicks_threshold_callback() {
         $options = get_option('baby_kick_tracker_options');
         echo '<input type="number" id="kicks_threshold" name="baby_kick_tracker_options[kicks_threshold]" value="' . esc_attr($options['kicks_threshold']) . '" class="small-text" min="1" />';
+        echo '<p class="description">Minimum number of kicks expected in a 2-hour period (default: 10).</p>';
+    } */
+
+    public function kicks_threshold_callback() {
+        $user_id = $this->is_admin && isset($_GET['user_id']) ? intval($_GET['user_id']) : $this->current_user_id;
+        $options = $this->get_user_options($user_id);
+        $threshold = isset($options['kicks_threshold']) ? intval($options['kicks_threshold']) : 10;
+        
+        echo '<input type="number" id="kicks_threshold" name="baby_kick_tracker_user_options[kicks_threshold]" value="' . esc_attr($threshold) . '" class="small-text" min="1" />';
         echo '<p class="description">Minimum number of kicks expected in a 2-hour period (default: 10).</p>';
     }
 
@@ -449,7 +777,7 @@ class Baby_Kick_Tracker {
 
     
     // Render admin dashboard page
-    public function render_admin_page() {
+    /* public function render_admin_page() {
         global $wpdb;
         
         // Get the latest session data
@@ -497,10 +825,108 @@ class Baby_Kick_Tracker {
         
         // Include the dashboard template
         include(plugin_dir_path(__FILE__) . 'templates/admin-dashboard.php');
+    } */
+
+    public function render_admin_page() {
+        global $wpdb;
+        
+        // For non-admin users, only show their own data
+        $user_id = $this->current_user_id;
+        
+        // For admins, check if a specific user was selected
+        $selected_user_id = 0;
+        if ($this->is_admin && isset($_GET['user_id'])) {
+            $selected_user_id = intval($_GET['user_id']);
+            if ($selected_user_id > 0) {
+                $user_id = $selected_user_id;
+            }
+        }
+        
+        $table_sessions = $wpdb->prefix . 'baby_kick_sessions';
+        $table_kicks = $wpdb->prefix . 'baby_kick_records';
+        
+        // If admin viewing summary (user_id = 0) or specific user
+        if ($this->is_admin && $selected_user_id === 0) {
+            // Get admin summary data
+            $latest_session = $wpdb->get_row("
+                SELECT s.*, u.display_name 
+                FROM $table_sessions s
+                JOIN {$wpdb->users} u ON s.user_id = u.ID
+                ORDER BY start_time DESC 
+                LIMIT 1
+            ");
+            
+            // Get kicks data for the last 7 days (all users)
+            $last_week_data = $wpdb->get_results("
+                SELECT 
+                    DATE(s.start_time) as date,
+                    SUM(s.total_kicks) as total_kicks,
+                    COUNT(s.id) as session_count
+                FROM $table_sessions s
+                WHERE s.start_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                GROUP BY DATE(s.start_time)
+                ORDER BY DATE(s.start_time) ASC
+            ");
+            
+            // Get total stats (all users)
+            $total_sessions = $wpdb->get_var("SELECT COUNT(*) FROM $table_sessions");
+            $total_kicks = $wpdb->get_var("SELECT SUM(total_kicks) FROM $table_sessions");
+        } else {
+            // Get user-specific data
+            $latest_session = $wpdb->get_row($wpdb->prepare("
+                SELECT * FROM $table_sessions 
+                WHERE user_id = %d
+                ORDER BY start_time DESC 
+                LIMIT 1
+            ", $user_id));
+            
+            // Get kicks data for the last 7 days (specific user)
+            $last_week_data = $wpdb->get_results($wpdb->prepare("
+                SELECT 
+                    DATE(s.start_time) as date,
+                    SUM(s.total_kicks) as total_kicks,
+                    COUNT(s.id) as session_count
+                FROM $table_sessions s
+                WHERE s.start_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                AND s.user_id = %d
+                GROUP BY DATE(s.start_time)
+                ORDER BY DATE(s.start_time) ASC
+            ", $user_id));
+            
+            // Get total stats (specific user)
+            $total_sessions = $wpdb->get_var($wpdb->prepare("
+                SELECT COUNT(*) FROM $table_sessions WHERE user_id = %d
+            ", $user_id));
+            $total_kicks = $wpdb->get_var($wpdb->prepare("
+                SELECT SUM(total_kicks) FROM $table_sessions WHERE user_id = %d
+            ", $user_id));
+        }
+        
+        $avg_kicks_per_session = $total_sessions > 0 ? round($total_kicks / $total_sessions, 1) : 0;
+
+        
+        // Prepare data for charts
+        $chart_labels = array();
+        $chart_data = array();
+        
+        foreach ($last_week_data as $day_data) {
+            $chart_labels[] = date('M d', strtotime($day_data->date));
+            $chart_data[] = (int) $day_data->total_kicks;
+        }
+        
+        // Get pregnancy details for the selected user
+        $pregnancy_details = $this->get_pregnancy_details($user_id);
+        $weekly_info = array();
+        if (isset($pregnancy_details['weeks'])) {
+            $weekly_info = $this->get_weekly_pregnancy_info($pregnancy_details['weeks']);
+        }
+        
+        // Include the dashboard template
+        include(plugin_dir_path(__FILE__) . 'templates/admin-dashboard.php');
     }
     
     // Render settings page
-    public function render_settings_page() {
+    /* public function render_settings_page() {
         ?>
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
@@ -513,10 +939,99 @@ class Baby_Kick_Tracker {
             </form>
         </div>
         <?php
+    } */
+
+    /* public function render_settings_page() {
+
+        // Check if admin selected a user to view/edit
+       $user_id = $this->current_user_id;
+
+       if ($this->is_admin && isset($_GET['user_id']) && intval($_GET['user_id']) > 0) {
+           $user_id = intval($_GET['user_id']);
+           
+           // If submitting form, save settings for selected user
+           if (isset($_POST['submit']) && isset($_POST['baby_kick_tracker_user_options'])) {
+               $this->save_user_options($user_id, $_POST['baby_kick_tracker_user_options']);
+               add_settings_error('baby_kick_tracker_settings', 'settings_updated', 'Settings saved for selected user.', 'updated');
+           }
+       }
+       
+       // Get user-specific options
+       $user_options = $this->get_user_options($user_id);
+
+       ?>
+       <div class="wrap">
+           <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+           
+           <?php if ($this->is_admin): ?>
+           <form method="get">
+               <input type="hidden" name="page" value="baby-kick-tracker-settings">
+               <?php $this->users_dropdown_callback(); ?>
+           </form>
+           <br>
+           <?php endif; ?>
+           
+           <form action="<?php echo admin_url('admin.php?page=baby-kick-tracker-settings' . ($this->is_admin && $user_id != $this->current_user_id ? '&user_id=' . $user_id : '')); ?>" method="post">
+               <?php
+               settings_fields('baby_kick_tracker_settings');
+               do_settings_sections('baby_kick_tracker_settings');
+               submit_button('Save Settings');
+               ?>
+           </form>
+       </div>
+       <?php
+   } */
+
+   public function render_settings_page() {
+    // Check if admin selected a user to view/edit
+        $user_id = $this->current_user_id;
+
+        if ($this->is_admin && isset($_GET['user_id']) && intval($_GET['user_id']) > 0) {
+            $user_id = intval($_GET['user_id']);
+            
+            // If submitting form, save settings for selected user
+            if (isset($_POST['submit']) && isset($_POST['baby_kick_tracker_user_options'])) {
+                $this->save_user_options($user_id, $_POST['baby_kick_tracker_user_options']);
+                add_settings_error('baby_kick_tracker_settings', 'settings_updated', 'Settings saved for selected user.', 'updated');
+            }
+        } else {
+            // Regular user saving their own settings
+            if (isset($_POST['submit']) && isset($_POST['baby_kick_tracker_user_options'])) {
+                $this->save_user_options($user_id, $_POST['baby_kick_tracker_user_options']);
+                add_settings_error('baby_kick_tracker_settings', 'settings_updated', 'Settings saved successfully.', 'updated');
+            }
+        }
+        
+        // Get user-specific options
+        $user_options = $this->get_user_options($user_id);
+
+        ?>
+        <div class="wrap">
+            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+            
+            <?php if ($this->is_admin): ?>
+            <form method="get">
+                <input type="hidden" name="page" value="baby-kick-tracker-settings">
+                <?php $this->users_dropdown_callback(); ?>
+            </form>
+            <br>
+            <?php endif; ?>
+            
+            <form action="<?php echo admin_url('admin.php?page=baby-kick-tracker-settings' . ($this->is_admin && $user_id != $this->current_user_id ? '&user_id=' . $user_id : '')); ?>" method="post">
+                <?php
+                settings_fields('baby_kick_tracker_settings');
+                do_settings_sections('baby_kick_tracker_settings');
+                submit_button('Save Settings');
+                ?>
+            </form>
+        </div>
+        <?php
     }
+
+
     
     // Render reports page
-    public function render_reports_page() {
+    /* public function render_reports_page() {
         global $wpdb;
         
         // Get date range from GET parameters or use defaults
@@ -539,10 +1054,64 @@ class Baby_Kick_Tracker {
         
         // Include the reports template
         include(plugin_dir_path(__FILE__) . 'templates/admin-reports.php');
+    } */
+
+    public function render_reports_page() {
+        global $wpdb;
+        
+        // Get date range from GET parameters or use defaults
+        $start_date = isset($_GET['start_date']) ? sanitize_text_field($_GET['start_date']) : date('Y-m-d', strtotime('-30 days'));
+        $end_date = isset($_GET['end_date']) ? sanitize_text_field($_GET['end_date']) : date('Y-m-d');
+        
+        // For admins, check if a specific user was selected
+        $user_id = $this->current_user_id;
+        $selected_user_id = 0;
+        
+        if ($this->is_admin && isset($_GET['user_id'])) {
+            $selected_user_id = intval($_GET['user_id']);
+            if ($selected_user_id > 0) {
+                $user_id = $selected_user_id;
+            }
+        }
+        
+        // Get session data for the date range
+        $table_sessions = $wpdb->prefix . 'baby_kick_sessions';
+        $table_kicks = $wpdb->prefix . 'baby_kick_records';
+        $table_notifications = $wpdb->prefix . 'baby_kick_notifications';
+        
+        if ($this->is_admin && $selected_user_id === 0) {
+            // Admin viewing all users
+            $sessions = $wpdb->get_results($wpdb->prepare("
+                SELECT 
+                    s.*,
+                    u.display_name,
+                    (SELECT COUNT(*) FROM $table_notifications n WHERE n.session_id = s.id) as notification_count
+                FROM $table_sessions s
+                JOIN {$wpdb->users} u ON s.user_id = u.ID
+                WHERE DATE(s.start_time) BETWEEN %s AND %s
+                ORDER BY s.start_time DESC
+            ", $start_date, $end_date));
+        } else {
+            // User viewing own data or admin viewing specific user
+            $sessions = $wpdb->get_results($wpdb->prepare("
+                SELECT 
+                    s.*,
+                    (SELECT COUNT(*) FROM $table_notifications n WHERE n.session_id = s.id) as notification_count
+                FROM $table_sessions s
+                WHERE DATE(s.start_time) BETWEEN %s AND %s
+                AND s.user_id = %d
+                ORDER BY s.start_time DESC
+            ", $start_date, $end_date, $user_id));
+        }
+        
+        // Include the reports template
+        include(plugin_dir_path(__FILE__) . 'templates/admin-reports.php');
     }
+
     
     // Frontend form to track kicks
-    public function render_kick_tracker_form() {
+    /* public function render_kick_tracker_form() {
+        
         global $wpdb;
         
         // Check if there's an active session
@@ -569,10 +1138,54 @@ class Baby_Kick_Tracker {
         
         // Return the buffered content
         return ob_get_clean();
+    } */
+
+    public function render_kick_tracker_form() {
+        // Check if user is logged in
+        if (!is_user_logged_in()) {
+            return '<div class="baby-kick-tracker-restricted">
+                <p>You must be logged in to track baby kicks. <a href="' . wp_login_url(get_permalink()) . '">Login here</a>.</p>
+            </div>';
+        }
+        
+        global $wpdb;
+        
+        // Check if there's an active session for the current user
+        $table_sessions = $wpdb->prefix . 'baby_kick_sessions';
+        $active_session = $wpdb->get_row($wpdb->prepare("
+            SELECT * FROM $table_sessions 
+            WHERE status = 'in_progress' 
+            AND user_id = %d
+            ORDER BY start_time DESC 
+            LIMIT 1
+        ", $this->current_user_id));
+        
+        // Get the user-specific options
+        $options = $this->get_user_options();
+        $kicks_threshold = isset($options['kicks_threshold']) ? (int) $options['kicks_threshold'] : 10;
+    
+        $pregnancy_details = $this->get_pregnancy_details($this->current_user_id);
+        $weekly_info = $this->get_weekly_pregnancy_info($pregnancy_details['weeks']);
+        
+        // Start output buffering
+        ob_start();
+        
+        // Include the form template
+        include(plugin_dir_path(__FILE__) . 'templates/kick-tracker-form.php');
+        
+        // Return the buffered content
+        return ob_get_clean();
     }
     
     // Ajax handler to record a kick
     public function record_baby_kick() {
+        if (!is_user_logged_in()) {
+            wp_send_json(array(
+                'success' => false,
+                'message' => 'You must be logged in to track baby kicks.'
+            ));
+            wp_die();
+        }
         global $wpdb;
         
         check_ajax_referer('baby_kick_tracker_nonce', 'security');
@@ -581,25 +1194,30 @@ class Baby_Kick_Tracker {
         $kick_count = isset($_POST['kick_count']) ? intval($_POST['kick_count']) : 1;
         $start_new_session = isset($_POST['start_new_session']) ? (bool) $_POST['start_new_session'] : false;
         
+        
         $table_sessions = $wpdb->prefix . 'baby_kick_sessions';
         $table_kicks = $wpdb->prefix . 'baby_kick_records';
         
         // If starting a new session
         if ($start_new_session) {
-            // Close any existing active sessions
+            // Close any existing active sessions for this user
             $wpdb->update(
                 $table_sessions,
                 array(
                     'status' => 'completed',
                     'end_time' => current_time('mysql')
                 ),
-                array('status' => 'in_progress')
+                array(
+                    'status' => 'in_progress',
+                    'user_id' => $this->current_user_id
+                )
             );
             
             // Create a new session
             $wpdb->insert(
                 $table_sessions,
                 array(
+                    'user_id' => $this->current_user_id,
                     'start_time' => current_time('mysql'),
                     'total_kicks' => $kick_count,
                     'status' => 'in_progress'
@@ -613,6 +1231,7 @@ class Baby_Kick_Tracker {
                 $table_kicks,
                 array(
                     'session_id' => $session_id,
+                    'user_id' => $this->current_user_id,
                     'kick_time' => current_time('mysql'),
                     'kick_count' => $kick_count
                 )
@@ -682,7 +1301,7 @@ class Baby_Kick_Tracker {
     }
     
     // Check kicks after one hour
-    public function hourly_check_kicks() {
+    /* public function hourly_check_kicks() {
         global $wpdb;
         
         $table_sessions = $wpdb->prefix . 'baby_kick_sessions';
@@ -759,7 +1378,89 @@ class Baby_Kick_Tracker {
                 )
             );
         }
+    } */
+
+    public function hourly_check_kicks() {
+        global $wpdb;
+        
+        $table_sessions = $wpdb->prefix . 'baby_kick_sessions';
+        $table_kicks = $wpdb->prefix . 'baby_kick_records';
+        $table_notifications = $wpdb->prefix . 'baby_kick_notifications';
+        
+        // Get active sessions that started more than 1 hour ago
+        $active_sessions = $wpdb->get_results("
+            SELECT * FROM $table_sessions 
+            WHERE status = 'in_progress' 
+            AND start_time <= DATE_SUB(NOW(), INTERVAL 1 HOUR)
+            AND start_time > DATE_SUB(NOW(), INTERVAL 2 HOUR)
+        ");
+        
+        if (!$active_sessions) {
+            return;
+        }
+        
+        foreach ($active_sessions as $session) {
+            // Get user-specific options
+            $user_options = $this->get_user_options($session->user_id);
+            $admin_email = isset($user_options['admin_email']) ? $user_options['admin_email'] : get_option('admin_email');
+            $mother_email = isset($user_options['mother_email']) ? $user_options['mother_email'] : '';
+            $kicks_threshold = isset($user_options['kicks_threshold']) ? (int) $user_options['kicks_threshold'] : 10;
+            
+            // Check if we already sent a reminder for this session
+            $reminder_sent = $wpdb->get_var($wpdb->prepare("
+                SELECT COUNT(*) FROM $table_notifications 
+                WHERE session_id = %d AND notification_type = 'one_hour_reminder'
+            ", $session->id));
+            
+            if ($reminder_sent > 0) {
+                continue;
+            }
+            
+            // Calculate remaining kicks needed
+            $remaining_kicks = $kicks_threshold - $session->total_kicks;
+            $time_elapsed = round((time() - strtotime($session->start_time)) / 60);
+            $time_remaining = 120 - $time_elapsed;
+            
+            // Create the email content
+            $subject = 'Baby Kick Tracker - One Hour Reminder';
+            $message = "Hello,\n\n";
+            $message .= "This is a reminder from your Baby Kick Tracker.\n\n";
+            $message .= "Session started at: " . date('F j, Y, g:i a', strtotime($session->start_time)) . "\n";
+            $message .= "Time elapsed: " . $time_elapsed . " minutes\n";
+            $message .= "Time remaining: " . $time_remaining . " minutes\n";
+            $message .= "Kicks recorded so far: " . $session->total_kicks . "\n";
+            
+            if ($remaining_kicks > 0) {
+                $message .= "Kicks needed to reach threshold (" . $kicks_threshold . "): " . $remaining_kicks . "\n\n";
+                $message .= "Have you felt any more kicks that you haven't recorded yet?\n";
+            } else {
+                $message .= "Great job! You've already reached the threshold of " . $kicks_threshold . " kicks.\n";
+            }
+            
+            $message .= "\nPlease continue to monitor and record baby kicks for the remaining hour.\n\n";
+            $message .= "Thank you,\nBaby Kick Tracker";
+            
+            // Send emails
+            $this->send_notification_email($admin_email, $subject, $message);
+            
+            if (!empty($mother_email) && $mother_email != $admin_email) {
+                $this->send_notification_email($mother_email, $subject, $message);
+            }
+            
+            // Log the notification
+            $wpdb->insert(
+                $table_notifications,
+                array(
+                    'session_id' => $session->id,
+                    'user_id' => $session->user_id,
+                    'notification_type' => 'one_hour_reminder',
+                    'recipient' => $mother_email . ($mother_email != $admin_email ? ', ' . $admin_email : ''),
+                    'message' => $message
+                )
+            );
+        }
     }
+
     
     // Complete a session after two hours
     public function session_completion($session_id) {
@@ -950,7 +1651,7 @@ class Baby_Kick_Tracker {
     }
     
     // Enqueue frontend scripts and styles
-    public function enqueue_frontend_scripts() {
+    /* public function enqueue_frontend_scripts() {
         wp_enqueue_style(
             'baby-kick-tracker-style',
             plugin_dir_url(__FILE__) . 'assets/css/baby-kick-tracker.css',
@@ -976,7 +1677,38 @@ class Baby_Kick_Tracker {
                 'assessment_period_hours' => get_option('baby_kick_tracker_options')['assessment_period_hours'] ?? 2
             )
         );
+    } */
+
+    public function enqueue_frontend_scripts() {
+        wp_enqueue_style(
+            'baby-kick-tracker-style',
+            plugin_dir_url(__FILE__) . 'assets/css/baby-kick-tracker.css',
+            array(),
+            '2.0.0'
+        );
+        
+        wp_enqueue_script(
+            'baby-kick-tracker-script',
+            plugin_dir_url(__FILE__) . 'assets/js/baby-kick-tracker.js',
+            array('jquery'),
+            '2.0.0',
+            true
+        );
+        
+        $user_options = $this->get_user_options();
+        
+        wp_localize_script(
+            'baby-kick-tracker-script',
+            'babyKickTracker',
+            array(
+                'ajaxurl' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('baby_kick_tracker_nonce'),
+                'kicks_threshold' => isset($user_options['kicks_threshold']) ? intval($user_options['kicks_threshold']) : 10,
+                'assessment_period_hours' => isset($user_options['assessment_period_hours']) ? intval($user_options['assessment_period_hours']) : 2
+            )
+        );
     }
+
     
     // Enqueue admin scripts and styles
     public function enqueue_admin_scripts($hook) {

@@ -5,6 +5,14 @@
 ?>
 <div class="wrap">
     <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+
+    <?php if ($this->is_admin): ?>
+    <form method="get">
+        <input type="hidden" name="page" value="baby-kick-tracker">
+        <?php $this->users_dropdown_callback(); ?>
+    </form>
+    <br>
+    <?php endif; ?>
     
     <div class="baby-kick-admin-container">
         <!-- Stats Overview -->
@@ -31,6 +39,18 @@
             </div>
         </div>
         
+        
+        <?php if ($this->is_admin && $selected_user_id === 0): ?>
+        <!-- Admin-specific summary stats could go here -->
+        <div class="baby-kick-admin-card">
+            <div class="baby-kick-admin-card-header">
+                <h2>System Summary</h2>
+            </div>
+            <p>Total registered users: <?php echo count_users()['total_users']; ?></p>
+            <p>Users tracking kicks: <?php echo $wpdb->get_var("SELECT COUNT(DISTINCT user_id) FROM $table_sessions"); ?></p>
+        </div>
+        <?php endif; ?>
+
         <!-- Latest Session -->
         <div class="baby-kick-admin-card">
             <div class="baby-kick-admin-card-header">

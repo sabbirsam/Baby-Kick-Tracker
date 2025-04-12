@@ -7,6 +7,26 @@
     <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
     
     <div class="baby-kick-admin-container">
+
+    <!-- User Selector for Admins -->
+        <?php if ($this->is_admin): ?>
+            <div class="baby-kick-admin-card">
+                <div class="baby-kick-admin-card-header">
+                    <h2>Select User</h2>
+                </div>
+                <form method="get">
+                    <input type="hidden" name="page" value="baby-kick-tracker-reports">
+                    <?php if (isset($_GET['start_date'])): ?>
+                    <input type="hidden" name="start_date" value="<?php echo esc_attr($start_date); ?>">
+                    <?php endif; ?>
+                    <?php if (isset($_GET['end_date'])): ?>
+                    <input type="hidden" name="end_date" value="<?php echo esc_attr($end_date); ?>">
+                    <?php endif; ?>
+                    <?php $this->users_dropdown_callback(); ?>
+                </form>
+            </div>
+        <?php endif; ?>
+            
         <!-- Date Filter -->
         <div class="baby-kick-admin-card">
             <div class="baby-kick-admin-card-header">
@@ -45,6 +65,9 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <?php if ($this->is_admin && $selected_user_id === 0): ?>
+                            <th>User</th>
+                            <?php endif; ?>
                             <th>Start Time</th>
                             <th>End Time</th>
                             <th>Total Kicks</th>
@@ -62,6 +85,9 @@
                         ?>
                             <tr>
                                 <td><?php echo $session->id; ?></td>
+                                <?php if ($this->is_admin && $selected_user_id === 0): ?>
+                                <td><?php echo isset($session->display_name) ? esc_html($session->display_name) : 'Unknown'; ?></td>
+                                <?php endif; ?>
                                 <td><?php echo date('F j, Y, g:i a', strtotime($session->start_time)); ?></td>
                                 <td>
                                     <?php 

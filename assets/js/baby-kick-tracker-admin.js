@@ -1,3 +1,4 @@
+// Update this function in baby-kick-tracker-admin.js
 (function($) {
     'use strict';
     
@@ -6,6 +7,11 @@
         if ($('#baby-kick-chart-weekly').length) {
             initWeeklyChart();
         }
+        
+        // Handle user selection in the admin
+        $('#baby_kick_tracker_user').on('change', function() {
+            this.form.submit();
+        });
         
         // Date range filters in reports
         $('#baby-kick-date-filter').on('submit', function(e) {
@@ -21,6 +27,12 @@
             const queryParams = new URLSearchParams(window.location.search);
             queryParams.set('start_date', startDate);
             queryParams.set('end_date', endDate);
+            
+            // Preserve the user_id if it exists
+            const userId = $('#baby_kick_tracker_user').val();
+            if (userId) {
+                queryParams.set('user_id', userId);
+            }
             
             window.location.href = window.location.pathname + '?' + queryParams.toString();
         });

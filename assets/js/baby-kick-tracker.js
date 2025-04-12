@@ -5,6 +5,12 @@
     'use strict';
     
     $(document).ready(function() {
+
+         // Check if user is logged in
+        if ($('#baby-kick-tracker-form').length === 0) {
+            return;
+        }
+
         const form = $('#baby-kick-tracker-form');
         const startBtn = $('#baby-kick-tracker-start');
         const addKickBtn = $('#baby-kick-tracker-add-kick');
@@ -183,13 +189,7 @@
             timerText += minutes + 'm ' + seconds + 's';
             
             timerDiv.text(timerText);
-            
-            // If session reaches 2 hours (7200 seconds), show completion message
-            /* if (diff >= 7200 && timer) {
-                clearInterval(timer);
-                timerDiv.text('Session completed (2 hours)');
-            } */
-
+        
             const assessmentPeriodSeconds = babyKickTracker.assessment_period_hours * 3600;
             if (diff >= assessmentPeriodSeconds && timer) {
                 clearInterval(timer);
@@ -197,7 +197,7 @@
             }
         }
         
-        // Update the status display based on kick count
+       
         function updateStatus(totalKicks) {
             statusDiv.removeClass('good warning');
             
